@@ -22,6 +22,13 @@
 #include <limits.h>
 #include <stdbool.h>
 
+extern bool quit_executed;
+
+typedef struct builtin_command_s {
+    char *name;
+    int (*func)(char **args, char **env);
+} builtin_command_t;
+
 typedef struct command_s {
     char **args;
     struct command_s *next;
@@ -41,3 +48,5 @@ char *read_input();
 command_t *parse_input(char *input);
 void execute_commands(shell_t *shell);
 void free_commands(command_t *head);
+bool is_builtin(command_t *cmd);
+void execute_builtin(command_t *cmd, shell_t *shell);

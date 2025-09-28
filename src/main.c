@@ -31,6 +31,7 @@ int main(int ac, char **av, char **env)
         }
         free(shell->input);
         shell->input = NULL;
+        if (quit_executed) break;
     }
     free_shell(shell);
     return 0;

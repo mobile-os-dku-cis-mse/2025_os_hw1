@@ -7,6 +7,8 @@
 
 #include "my.h"
 
+bool quit_executed = false;
+
 void free_commands(command_t *head)
 {
     command_t *current = head;
@@ -148,7 +150,14 @@ void execute_commands(shell_t *shell)
     }
 
     int i = 0;
+    int builtin_executed = 0;
     for (command_t *c = cmd; c != NULL; c = c->next, i++) {
+        if (is_builtin(c)) {
+            execute_builtin(c, shell);
+            ++builtin_executed;
+            if (quit_executed) break;
+            continue;
+        }
         pids[i] = fork();
         if (pids[i] == -1) {
             perror("fork");
@@ -189,7 +198,7 @@ void execute_commands(shell_t *shell)
     }
     free(pipes);
     // Wait for all children
-    for (int j = 0; j < i; j++) {
+    for (int j = 0; j < i - builtin_executed; j++) {
         int status;
         waitpid(pids[j], &status, 0);
         if (WIFEXITED(status)) {
