@@ -1,53 +1,87 @@
-# os_hw1
-HW1: Simple MyShell
+# MiniShell
 
-Operating Systems & Adv. Mobile project HW1: simple Shell (SiSH)
+## Overview
 
-**Due by Sep. 30**
+MiniShell is a lightweight implementation of a Unix-like shell. This project is designed to replicate the core functionalities of a shell, including command parsing, execution, signal handling, and support for built-in commands. It is a learning project aimed at understanding the inner workings of operating systems and shell environments.
 
-Introduction
-Shell is a small program that allows a user to directly interact with your operating system. A user can command (give orders) to run program through shell. To do that, shell takes input string from a user, and make it run. When the specified program completes its execution, the shell takes another input to run another program.
+## Features
 
-In this homework (programming assignment), you will have to write a small shell program.
+- **Command Execution**: Execute external programs and commands using `execvp`.
+- **Piping**: Support for command pipelines (e.g., `ls | grep txt`).
+- **Built-in Commands**: Includes built-in commands such as `cd` and `quit`.
+- **Signal Handling**: Graceful handling of signals like `SIGINT` and `SIGQUIT`.
+- **Environment Variables**: Access and manipulate environment variables.
+- **Error Handling**: Robust error handling for system calls and memory allocation.
 
-Shell usually works with low-level OS functions such as system calls. You may look into detailed usage of the following system calls: fork, execve, wait. Fork is a system call that creates another user process; it actually creates a copy of the caller. Then, the process becomes two different processes, return with different values. For parent process (that creates the child), fork() call returns with some number, that is the process id of the child process. For child process, fork() call returns with zero. Note that both (parent and the child) uses the same code base.
+## File Structure
 
-Execve is another important OS function that change the process into another process. The call takes the filename as argument, that the user wants to execute. The call discards the current program context (address space, changed memory values, register values, etc.), and loads the specified program into the memory. It then begins execution from the very beginning point of the program. Now that you can run another program that you want to execute in the child process.
+### Source Files
 
-Finally, wait() is a system call that stops the execution of the parent process. The parent process has to wait until the child completes its execution in order to gather and clean up the resources used by the children. The wait() call implements such waiting.
+- **`src/main.c`**: Entry point of the shell. Initializes the shell, sets up signal handlers, and manages the main execution loop.
+- **`src/commands/commands_handling.c`**: Handles parsing and execution of commands, including support for pipelines and child processes.
+- **`src/commands/builtin_commands.c`**: Implements built-in commands like `cd` and `quit`.
+- **`src/environment/init.c`**: Initializes the shell environment and manages memory cleanup.
+- **`src/signals/signals_handling.c`**: Defines signal handlers for `SIGINT` and `SIGQUIT`.
 
-## You may further look into the following APIs: strtok_r, getenv.
+### Header Files
 
-# Specific requirements
-1.	(optional) make & compile: write a makefile that compiles your code. I will just type make on the terminal.
-1.	Start of SiSH: by entering the executable filename, your shell starts.
-1.	End of Sish: SiSH finishes execution when it gets ‘quit’ string from the user.
-1.	Operation of SiSH:
-    1.	Input: takes program name as input string
-    1.	Execution: it has to execute every single executable program in the filesystem, if it has proper privilege
-    1.	Execution path: to simplify (contract) the filename (full path beginning with ‘/’), SiSH should look into directories, in PATH environment variable.
-    1.	PATH environment variable holds the ‘:’-separated string, that specifies multiple locations in the filesystem.
-    1.	During the execution of the user-input program, shell should not be active.
-    1.	Repetition: When the given program completes its execution, it receives the next input string, to run another program.
-1.	(optional) You can specify different shell prompt using getenv function. (e.g. your current working directory (PWD, TIME, USER, etc.)
-1.	(optional) You can take additional input parameters for the executing program, and pass them to the created process. Please find manual pages of execve system call.
-1.	Document:
-    1.	You should include some report for your code project, hw, etc.
-    1.	The report should include general/brief introduction to your program.
-    1.	The report should include specific instruction to make your program.
-    1.	The report should include specific working example. (screen capture, whatever)
-    1.	The report can include your personal ideas, feedback messages to me.
-1.	Submission
-    1.	You have five freedays. (for all projects, homework assignments)
-    1.	Submit your code through github account, in **your own branch**.
-    1.	Branch should be your student ID.
-    1.	Test before push. Do not push the broken code in git.
-1.	Evaluation
-    1.	It’s better if your code is different from the others.
-    1.	More functionalities, more error handling is better.
+- **`include/my.h`**: Contains type definitions, function prototypes, and global variables.
 
-No restrictions on working environment, if it supports POSIX standard programming interface. However, I strongly recommend you to stick to assam server; you may have different working environment, according to the running platform (OS).
+### Given Files
 
-No copy allowed. Please push your code in github hw1, in different branches. Do not push your code to master branch! Note that you can look at others’ code, and vice versa.
+- **`given_files/fork.c`**: Demonstrates basic usage of `fork` and `wait`.
+- **`given_files/fork2.c`**: Explores advanced `fork` usage with signal handling and timers.
+- **`given_files/getenv.c`**: Example of retrieving and parsing environment variables.
+- **`given_files/stat.c`**: Demonstrates usage of the `stat` system call.
 
-Different code implies better evaluation. Enjoy your system-level programming!
+### Configuration Files
+
+- **`.vscode/settings.json`**: Configures file associations for the development environment.
+- **`Makefile`**: Automates the build process for the project.
+
+### License
+
+- **`LICENSE`**: The project is licensed under the MIT License.
+
+## How to Build and Run
+
+1. Clone the repository:
+    ```bash
+    git clone <repository-url>
+    cd 2025_os_hw1
+    ```
+
+2. Build the project:
+    ```bash
+    make
+    ```
+
+3. Run the shell:
+    ```bash
+    ./mysh
+    ```
+
+## Usage
+
+- **Run Commands**: Type any valid Unix command and press Enter.
+- **Built-in Commands**:
+  - `cd <directory>`: Change the current working directory.
+  - `quit`: Exit the shell.
+- **Pipelines**: Use `|` to chain commands (e.g., `ls | grep txt`).
+
+## Signal Handling
+
+- **`SIGINT`**: Interrupt the current command and display a new prompt.
+- **`SIGQUIT`**: Display a quit message and return to the prompt.
+
+## Error Handling
+
+- Displays appropriate error messages for invalid commands, memory allocation failures, and system call errors.
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+## Acknowledgments
+
+This project was developed as part of an Operating Systems course in 2025. It serves as a practical exercise to deepen understanding of process management, inter-process communication, and shell design.
