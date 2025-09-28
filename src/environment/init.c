@@ -33,7 +33,7 @@ shell_t *init_shell(char **env)
         exit(84);
     }
 
-    // Copy environment variables
+    // Copy environment variables just to show that I can do it but later we will use the original env using execvp.
     for (size_t i = 0; i < env_count; i++) {
         shell->env[i] = strdup(env[i]);
         if (shell->env[i] == NULL) {
