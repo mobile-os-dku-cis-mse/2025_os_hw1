@@ -36,14 +36,3 @@ int main(int ac, char **av, char **env)
     free_shell(shell);
     return 0;
 }
-
-// a faire le cd !!!
-// if (verif_cd(shell->buffer)) {
-//         if (access(shell->entry[1], F_OK) == -1)
-//             write(2, "cd: No such file or directory.\n", 31);
-//         else if (access(shell->entry[1], R_OK) == -1)
-//             write(2, "cd: Permission denied.\n", 23);
-//         else
-//             chdir(shell->entry[1]);
-//         return 1;
-//     
