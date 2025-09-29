@@ -29,7 +29,6 @@ char *check_access(char *cmd, char **envp)
         sprintf(full_path, "%s/%s", token, cmd);
     
         if (!access(full_path, X_OK)) {
-            printf("Executing %s\n", full_path);
             return full_path;
         }
         token = strtok(NULL, ":");
@@ -80,9 +79,6 @@ int execution(char *buf, char **envp)
     char *command = check_access(command_without_args, envp);
     int nbr_args = count_args(buf);
     char **args = parse_args(buf, nbr_args);
-
-
-    printf("Number of arguments: %d\n", nbr_args);
 
     if (!command) {
         printf("Command not found: %s\n", buf);
