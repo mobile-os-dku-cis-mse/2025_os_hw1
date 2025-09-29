@@ -7,6 +7,17 @@ char *check_access(char *cmd, char **envp)
     char *token = NULL;
     char *full_path = NULL;
 
+    if (!cmd || !envp)
+        return NULL;
+    
+    if (cmd[0] == '/' || (cmd[0] == '.' && cmd[1] == '/')) {
+        if (!access(cmd, X_OK)) {
+            return strdup(cmd);
+        } else {
+            return NULL;
+        }
+    }
+    
     for (int i = 0; envp[i] != NULL; i++) {
         if (strncmp(envp[i], "PATH=", 5) == 0) {
             path = calloc(1, strlen(envp[i]) - 3);
