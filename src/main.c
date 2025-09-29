@@ -33,6 +33,35 @@ void parse_command(char* line, char** command_argv) {
 }
 
 
+bool find_command_path(const char* program, char* full_path) {
+    char* path_env = getenv("PATH");
+    if (path_env == NULL) {
+        return false;
+    }
+
+    char* path_copy = strdup(path_env);
+    if (path_copy == NULL) {
+        perror("find_command_path:strdup");
+        return false;
+    }
+
+    char* dir = strtok(path_copy, ":");
+
+    while (dir != NULL) {
+        snprintf(full_path, MAX_PATH_LEN, "%s/%s", dir, program);
+
+        if (access(full_path, X_OK) == 0) {
+            free(path_copy);
+            return true;
+        }
+
+        dir = strtok(NULL, ":");
+    }
+
+    free(path_copy);
+    return false;
+}
+
 int main(int argc, const char * argv[]) {
 
     while (1) {
@@ -41,5 +70,7 @@ int main(int argc, const char * argv[]) {
 
         char* command_line = read_user_command();
         parse_command(command_line, command_argv);
+        bool tmp = find_command_path(command_argv[0], executable_path);
+        // fork + execvp
     }
 }
