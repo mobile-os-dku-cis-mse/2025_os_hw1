@@ -18,6 +18,20 @@ char* read_user_command() {
     return line;
 }
 
+// todo MAX_ARGS에 대한 예외처리
+void parse_command(char* line, char** command_argv) {
+    int i = 0;
+    char* token = strtok(line, " \t\r\n");
+
+    while (token != NULL && i < MAX_ARGS - 1) {
+        command_argv[i++] = token;
+
+        token = strtok(NULL, " \t\r\n");
+    }
+
+    command_argv[i] = NULL;
+}
+
 
 int main(int argc, const char * argv[]) {
 
@@ -26,5 +40,6 @@ int main(int argc, const char * argv[]) {
         char* executable_path[MAX_PATH_LEN];
 
         char* command_line = read_user_command();
+        parse_command(command_line, command_argv);
     }
 }
