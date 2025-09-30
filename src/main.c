@@ -80,11 +80,6 @@ void launch_process(char** argv, const char* executable_path) {
             exit(EXIT_FAILURE);
         }
     } else {
-        // --- 👨‍👩‍👧 부모 프로세스 ---
-        // 3. 자식이 끝날 때까지 대기 (wait)
-        // 자식 프로세스가 정상적으로 종료(WIFEXITED)되거나
-        // 시그널에 의해 종료(WIFSIGNALED)될 때까지 계속 대기한다.
-        // 이는 waitpid가 시그널에 의해 중단(interrupted)되는 경우를 처리하는 견고한 방법이다.
         do {
             waitpid(pid, &status, WUNTRACED);
         } while (!WIFEXITED(status) && !WIFSIGNALED(status));

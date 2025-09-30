@@ -1,4 +1,4 @@
 #ifndef INC_2025_OS_HW1_INIT_H
 #define INC_2025_OS_HW1_INIT_H
 
-#endif //INC_2025_OS_HW1_INIT_H
+#endif
