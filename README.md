@@ -61,7 +61,6 @@ Author
 Javokhir Khalikov
 Dankook University, 2025
 
----
 
 This design uses:
 
