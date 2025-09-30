@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <sys/wait.h>
 
 #define MAX_CMD_LEN 1024
 #define MAX_PATH_LEN 1024
@@ -62,6 +63,27 @@ bool find_command_path(const char* program, char* full_path) {
     return false;
 }
 
+void launch_process(char** argv, const char* executable_path) {
+    pid_t pid= fork();
+    int status;
+
+    if (pid < 0) {
+        perror("launch_process:fork");
+        return;
+    }
+
+    if (pid == 0) {
+        if (execv(executable_path, argv) == -1) {
+            perror("launch_process:pid==0");
+            exit(EXIT_FAILURE);
+        }
+    } else {
+        do {
+            waitpid(pid, &status, WUNTRACED);
+        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+    }
+}
+
 int main(int argc, const char * argv[]) {
 
     while (1) {
@@ -71,6 +93,6 @@ int main(int argc, const char * argv[]) {
         char* command_line = read_user_command();
         parse_command(command_line, command_argv);
         bool tmp = find_command_path(command_argv[0], executable_path);
-        // fork + execvp
+        launch_process(command_argv, executable_path);
     }
 }
