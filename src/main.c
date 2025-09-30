@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include <unistd.h>
 #include <stdbool.h>
 #include <sys/wait.h>
+#include "builtins.h"
 
 #define MAX_CMD_LEN 1024
 #define MAX_PATH_LEN 1024
@@ -78,6 +78,11 @@ void launch_process(char** argv, const char* executable_path) {
             exit(EXIT_FAILURE);
         }
     } else {
+        // --- 👨‍👩‍👧 부모 프로세스 ---
+        // 3. 자식이 끝날 때까지 대기 (wait)
+        // 자식 프로세스가 정상적으로 종료(WIFEXITED)되거나
+        // 시그널에 의해 종료(WIFSIGNALED)될 때까지 계속 대기한다.
+        // 이는 waitpid가 시그널에 의해 중단(interrupted)되는 경우를 처리하는 견고한 방법이다.
         do {
             waitpid(pid, &status, WUNTRACED);
         } while (!WIFEXITED(status) && !WIFSIGNALED(status));
@@ -87,12 +92,28 @@ void launch_process(char** argv, const char* executable_path) {
 int main(int argc, const char * argv[]) {
 
     while (1) {
+        int is_builtin = 0;
         char* command_argv[MAX_ARGS];
-        char* executable_path[MAX_PATH_LEN];
+        char executable_path[MAX_PATH_LEN];
 
         char* command_line = read_user_command();
         parse_command(command_line, command_argv);
-        bool tmp = find_command_path(command_argv[0], executable_path);
-        launch_process(command_argv, executable_path);
+        if (command_argv[0]==NULL) continue;
+
+        for (int i = 0; builtins[i].name != NULL; i++) {
+            if (strcmp(command_argv[0], builtins[i].name) == 0) {
+                int status = builtins[i].func(command_argv);
+                is_builtin = 1;
+
+                if (status == 0) {
+                    exit(EXIT_SUCCESS);
+                }
+                break;
+            }
+        }
+        if (!is_builtin) {
+            bool tmp = find_command_path(command_argv[0], executable_path);
+            launch_process(command_argv, executable_path);
+        }
     }
 }
