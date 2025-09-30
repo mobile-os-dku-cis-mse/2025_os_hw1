@@ -1,26 +1,31 @@
 # os_hw1 : Report
 
 ## 1. Brief Introduction
-This simple Shell (SiSH) is a program hat allows a user to directly interact with your operating system. A user can command to run program through shell. This shell takes input strings and make it run. When execution is complete, the shell can take another input and run another program.
+This simple Shell (SiSH) is a program that allows a user to directly interact with your operating system. A user can command to run program through shell. This shell takes input strings and make it run. When execution is complete, the shell can then take another input and run another program.    
+
 The Shell can :
 - Read inputs commands from the terminal
 - Parse the input
 - Execute these commands by forking and running executables
-- (Bonus) Customizable prompt via "PS1" environment variable
-- Exit the shell via "quit" command
+- (Bonus) Customizable prompt via `PS1` environment variable
+- Exit the shell via `quit` command
 
 The goal of this project is to practice system programming in C including Process Creation (`fork`) and Program execution (`exec`)
 
 ## 2. Build Instructions
+#### Create a build folder and navigate to it
 ```shell
 mkdir build && cd build
 ```
+#### Run cmake
 ```shell
 cmake ..
 ```
+#### Compile the project
 ```shell
 make
 ```
+#### Run the program
 ```shell
 ./sish
 ```
