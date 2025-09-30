@@ -40,11 +40,13 @@ bool find_command_path(const char* program, char* full_path) {
         return false;
     }
 
-    char* path_copy = strdup(path_env);
+    size_t len = strlen(path_env);
+    char* path_copy = (char*)malloc(len + 1);
     if (path_copy == NULL) {
-        perror("find_command_path:strdup");
+        perror("find_command_path:malloc");
         return false;
     }
+    strcpy(path_copy, path_env);
 
     char* dir = strtok(path_copy, ":");
 
