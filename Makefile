@@ -62,7 +62,7 @@ $(BUILD_DIR)/%.o: %.c
 	@ $(ECHO) "$(C_GREEN)[OK]$(C_GREY) -> $<$(C_RESET)"
 
 $(NAME):	$(OBJ)
-	@ $(CC) -o $@ $^ -lelf
+	@ $(CC) -o $@ $^
 	@ $(ECHO) -n "$(C_PINK)|==========> $(NAME) compiled "
 	@ $(ECHO) "with $(NB_FILES) file(s). <==========|$(C_RESET)"
 
