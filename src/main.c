@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <sys/wait.h>
 #include "builtins.h"
+#include "signal_handler.h"
 
 #define MAX_CMD_LEN 1024
 #define MAX_PATH_LEN 1024
@@ -75,6 +76,8 @@ void launch_process(char** argv, const char* executable_path) {
     }
 
     if (pid == 0) {
+        reset_child_signals();
+
         if (execv(executable_path, argv) == -1) {
             perror("launch_process:pid==0");
             exit(EXIT_FAILURE);
@@ -87,6 +90,7 @@ void launch_process(char** argv, const char* executable_path) {
 }
 
 int main(int argc, const char * argv[]) {
+    setup_signal_handlers();
 
     while (1) {
         int is_builtin = 0;
