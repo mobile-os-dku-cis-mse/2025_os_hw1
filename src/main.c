@@ -11,19 +11,28 @@
 #define MAX_PATH_LEN 1024
 #define MAX_ARGS    128
 
-// todo 넘을 때, 예외처리
-char* read_user_command() {
+char *read_user_command() {
     static char line[MAX_CMD_LEN];
     printf("sish> ");
     fgets(line, sizeof(line), stdin);
+
+    if (strchr(line, '\n') == NULL) {
+        fprintf(stderr, "Error: Input command is too long.\n");
+
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF);
+
+        return NULL;
+    }
+
     line[strcspn(line, "\n")] = '\0';
     return line;
 }
 
 // todo MAX_ARGS에 대한 예외처리
-void parse_command(char* line, char** command_argv) {
+void parse_command(char *line, char **command_argv) {
     int i = 0;
-    char* token = strtok(line, " \t\r\n");
+    char *token = strtok(line, " \t\r\n");
 
     while (token != NULL && i < MAX_ARGS - 1) {
         command_argv[i++] = token;
@@ -35,21 +44,21 @@ void parse_command(char* line, char** command_argv) {
 }
 
 
-bool find_command_path(const char* program, char* full_path) {
-    char* path_env = getenv("PATH");
+bool find_command_path(const char *program, char *full_path) {
+    char *path_env = getenv("PATH");
     if (path_env == NULL) {
         return false;
     }
 
     size_t len = strlen(path_env);
-    char* path_copy = (char*)malloc(len + 1);
+    char *path_copy = (char *) malloc(len + 1);
     if (path_copy == NULL) {
         perror("find_command_path:malloc");
         return false;
     }
     strcpy(path_copy, path_env);
 
-    char* dir = strtok(path_copy, ":");
+    char *dir = strtok(path_copy, ":");
 
     while (dir != NULL) {
         snprintf(full_path, MAX_PATH_LEN, "%s/%s", dir, program);
@@ -66,8 +75,8 @@ bool find_command_path(const char* program, char* full_path) {
     return false;
 }
 
-void launch_process(char** argv, const char* executable_path) {
-    pid_t pid= fork();
+void launch_process(char **argv, const char *executable_path) {
+    pid_t pid = fork();
     int status;
 
     if (pid < 0) {
@@ -89,17 +98,19 @@ void launch_process(char** argv, const char* executable_path) {
     }
 }
 
-int main(int argc, const char * argv[]) {
+int main(int argc, const char *argv[]) {
     setup_signal_handlers();
 
     while (1) {
         int is_builtin = 0;
-        char* command_argv[MAX_ARGS];
+        char *command_argv[MAX_ARGS];
         char executable_path[MAX_PATH_LEN];
 
-        char* command_line = read_user_command();
+        char *command_line = read_user_command();
+        if (command_line == NULL) continue;
+
         parse_command(command_line, command_argv);
-        if (command_argv[0]==NULL) continue;
+        if (command_argv[0] == NULL) continue;
 
         for (int i = 0; builtins[i].name != NULL; i++) {
             if (strcmp(command_argv[0], builtins[i].name) == 0) {
