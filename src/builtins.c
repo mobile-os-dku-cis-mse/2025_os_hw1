@@ -1,8 +1,19 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <stdbool.h>
+#include <string.h>
+#include <stdlib.h>
 #include "builtins.h"
 
+typedef int (*builtin_func)(char **args);
+
+typedef struct {
+    char *name;
+    builtin_func func;
+} BuiltinCommand;
+
 int builtin_exit(char **args) {
+    (void)args;
     return 0;
 }
 
@@ -32,6 +43,7 @@ int builtin_echo(char **args) {
 
 
 int builtin_pwd(char **args) {
+    (void)args;
     char cwd[1024];
 
     if (getcwd(cwd, sizeof(cwd)) != NULL) {
@@ -49,3 +61,19 @@ BuiltinCommand builtins[] = {
     { "pwd",  &builtin_pwd  },
     { NULL,   NULL       }
 };
+
+bool check_builtins(char** command) {
+    bool is_builtin = false;
+    for (int i = 0; builtins[i].name != NULL; i++) {
+        if (strcmp(command[0], builtins[i].name) == 0) {
+            int status = builtins[i].func(command);
+            is_builtin = true;
+
+            if (status == 0) {
+                exit(EXIT_SUCCESS);
+            }
+            break;
+        }
+    }
+    return is_builtin;
+}

@@ -7,9 +7,9 @@
 #include "builtins.h"
 #include "signal_handler.h"
 
-#define MAX_CMD_LEN 1024
+#define MAX_CMD_LEN  1024
 #define MAX_PATH_LEN 1024
-#define MAX_ARGS    128
+#define MAX_ARGS     128
 
 char *read_user_command() {
     static char line[MAX_CMD_LEN];
@@ -107,7 +107,6 @@ int main(int argc, const char *argv[]) {
     setup_signal_handlers();
 
     while (1) {
-        int is_builtin = 0;
         char *command_argv[MAX_ARGS];
         char executable_path[MAX_PATH_LEN];
 
@@ -117,20 +116,13 @@ int main(int argc, const char *argv[]) {
         if(parse_command(command_line, command_argv) != 0) continue;
         if (command_argv[0] == NULL) continue;
 
-        for (int i = 0; builtins[i].name != NULL; i++) {
-            if (strcmp(command_argv[0], builtins[i].name) == 0) {
-                int status = builtins[i].func(command_argv);
-                is_builtin = 1;
+        bool is_builtin = check_builtins(command_argv);
 
-                if (status == 0) {
-                    exit(EXIT_SUCCESS);
-                }
-                break;
-            }
-        }
         if (!is_builtin) {
-            bool tmp = find_command_path(command_argv[0], executable_path);
+            find_command_path(command_argv[0], executable_path);
             launch_process(command_argv, executable_path);
         }
     }
+
+    return 0;
 }
