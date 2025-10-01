@@ -75,18 +75,3 @@ void setup_signal_handlers(void) {
         exit(1);
     }
 }
-
-void check_signal_handler(int signum, const char *signame) {
-    struct sigaction current_action;
-
-    if (sigaction(signum, NULL, &current_action) == 0) {
-        printf("[DEBUG] Handler for %s: ", signame);
-        if (current_action.sa_handler == SIG_DFL) {
-            printf("SIG_DFL \n");
-        } else if (current_action.sa_handler == SIG_IGN) {
-            printf("SIG_IGN \n");
-        } else {
-            printf("Custom Handler at %p\n", current_action.sa_handler);
-        }
-    }
-}

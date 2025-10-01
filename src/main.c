@@ -91,9 +91,6 @@ void launch_process(char** argv, const char* executable_path) {
 
 int main(int argc, const char * argv[]) {
     setup_signal_handlers();
-    printf ( "--- Initial Signal Setup --\n");
-    check_signal_handler(SIGTSTP, "SIGTSTP");
-    printf ("--------------\n");
 
     while (1) {
         int is_builtin = 0;
