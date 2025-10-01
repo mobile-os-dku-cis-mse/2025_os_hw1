@@ -29,8 +29,7 @@ char *read_user_command() {
     return line;
 }
 
-// todo MAX_ARGS에 대한 예외처리
-void parse_command(char *line, char **command_argv) {
+int parse_command(char *line, char **command_argv) {
     int i = 0;
     char *token = strtok(line, " \t\r\n");
 
@@ -40,7 +39,13 @@ void parse_command(char *line, char **command_argv) {
         token = strtok(NULL, " \t\r\n");
     }
 
+    if (token != NULL) {
+        fprintf(stderr, "sish: Error: Too many arguments.\n");
+        return -1;
+    }
+
     command_argv[i] = NULL;
+    return 0;
 }
 
 
@@ -109,7 +114,7 @@ int main(int argc, const char *argv[]) {
         char *command_line = read_user_command();
         if (command_line == NULL) continue;
 
-        parse_command(command_line, command_argv);
+        if(parse_command(command_line, command_argv) != 0) continue;
         if (command_argv[0] == NULL) continue;
 
         for (int i = 0; builtins[i].name != NULL; i++) {
