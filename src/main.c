@@ -1,9 +1,12 @@
+#define _POSIX_C_SOURCE 200809L
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <stdbool.h>
 #include <sys/wait.h>
+#include <limits.h>
 #include "builtins.h"
 #include "signal_handler.h"
 
@@ -11,9 +14,33 @@
 #define MAX_PATH_LEN 1024
 #define MAX_ARGS     128
 
+void print_prompt() {
+    char cwd[PATH_MAX + 1];
+
+    if (getcwd(cwd, sizeof(cwd)) == NULL) {
+        perror("getcwd");
+        strncpy(cwd, "", sizeof(cwd));
+    }
+
+    char *home_dir = getenv("HOME");
+    char *display_path = cwd;
+
+    if (home_dir != NULL) {
+        size_t home_len = strlen(home_dir);
+        if (strncmp(cwd, home_dir, home_len) == 0) {
+            display_path = cwd + home_len;
+            printf("From ( ~%s ) sish> ", display_path);
+            return;
+        }
+    }
+
+    printf("From ( %s ) sish> ", display_path);
+    fflush(stdout);
+}
+
 char *read_user_command() {
     static char line[MAX_CMD_LEN];
-    printf("sish> ");
+    print_prompt();
     fgets(line, sizeof(line), stdin);
 
     if (strchr(line, '\n') == NULL) {
