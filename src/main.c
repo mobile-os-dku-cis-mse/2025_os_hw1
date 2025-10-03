@@ -111,7 +111,7 @@ void launch_process(command_t *cmd) {
     }
 }
 
-int main(int argc, const char *argv[]) {
+int main() {
     setup_signal_handlers();
 
     while (1) {
