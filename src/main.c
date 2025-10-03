@@ -11,8 +11,6 @@
 #include "command.h"
 #include "signal_handler.h"
 
-#define MAX_PATH_LEN 1024
-
 void print_prompt() {
     char cwd[PATH_MAX + 1];
 
@@ -55,7 +53,7 @@ char *read_user_command() {
     return line;
 }
 
-bool find_command_path(const char *program, char *full_path) {
+bool find_command_path(command_t *cmd) {
     char *path_env = getenv("PATH");
     if (path_env == NULL) {
         return false;
@@ -72,9 +70,9 @@ bool find_command_path(const char *program, char *full_path) {
     char *dir = strtok(path_copy, ":");
 
     while (dir != NULL) {
-        snprintf(full_path, MAX_PATH_LEN, "%s/%s", dir, program);
+        snprintf(cmd->executable_path, MAX_PATH_LEN, "%s/%s", dir, cmd->args[0]);
 
-        if (access(full_path, X_OK) == 0) {
+        if (access(cmd->executable_path, X_OK) == 0) {
             free(path_copy);
             return true;
         }
@@ -86,7 +84,7 @@ bool find_command_path(const char *program, char *full_path) {
     return false;
 }
 
-void launch_process(command_t *cmd, const char *executable_path) {
+void launch_process(command_t *cmd) {
     pid_t pid = fork();
     int status;
 
@@ -102,7 +100,7 @@ void launch_process(command_t *cmd, const char *executable_path) {
             exit(1);
         }
 
-        if (execv(executable_path, cmd->args) == -1) {
+        if (execv(cmd->executable_path, cmd->args) == -1) {
             perror("launch_process:pid==0");
             exit(EXIT_FAILURE);
         }
@@ -118,7 +116,6 @@ int main(int argc, const char *argv[]) {
 
     while (1) {
         command_t cmd;
-        char executable_path[MAX_PATH_LEN];
 
         char *command_line = read_user_command();
         if (command_line == NULL) continue;
@@ -136,8 +133,8 @@ int main(int argc, const char *argv[]) {
         bool is_builtin = check_builtins(cmd.args);
 
         if (!is_builtin) {
-            find_command_path(cmd.args[0], executable_path);
-            launch_process(&cmd, executable_path);
+            find_command_path(&cmd);
+            launch_process(&cmd);
         }
 
         cleanup_command(&cmd);

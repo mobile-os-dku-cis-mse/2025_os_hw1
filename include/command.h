@@ -1,6 +1,7 @@
 #ifndef INC_2025_OS_HW1_COMMAND_H
 #define INC_2025_OS_HW1_COMMAND_H
 
+#define MAX_PATH_LEN 1024
 #define MAX_CMD_LEN  1024
 #define MAX_REDIR    3
 #define MAX_ARGS     128
@@ -8,6 +9,7 @@
 #include "redirection.h"
 
 typedef struct {
+    char executable_path[MAX_PATH_LEN];
     char *args[MAX_ARGS];
     redirection redirs[MAX_REDIR];
     int redir_count;
