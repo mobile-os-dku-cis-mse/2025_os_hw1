@@ -8,11 +8,10 @@
 #include <sys/wait.h>
 #include <limits.h>
 #include "builtins.h"
+#include "command.h"
 #include "signal_handler.h"
 
-#define MAX_CMD_LEN  1024
 #define MAX_PATH_LEN 1024
-#define MAX_ARGS     128
 
 void print_prompt() {
     char cwd[PATH_MAX + 1];
@@ -56,26 +55,6 @@ char *read_user_command() {
     return line;
 }
 
-int parse_command(char *line, char **command_argv) {
-    int i = 0;
-    char *token = strtok(line, " \t\r\n");
-
-    while (token != NULL && i < MAX_ARGS - 1) {
-        command_argv[i++] = token;
-
-        token = strtok(NULL, " \t\r\n");
-    }
-
-    if (token != NULL) {
-        fprintf(stderr, "sish: Error: Too many arguments.\n");
-        return -1;
-    }
-
-    command_argv[i] = NULL;
-    return 0;
-}
-
-
 bool find_command_path(const char *program, char *full_path) {
     char *path_env = getenv("PATH");
     if (path_env == NULL) {
@@ -107,7 +86,7 @@ bool find_command_path(const char *program, char *full_path) {
     return false;
 }
 
-void launch_process(char **argv, const char *executable_path) {
+void launch_process(command_t *cmd, const char *executable_path) {
     pid_t pid = fork();
     int status;
 
@@ -119,7 +98,11 @@ void launch_process(char **argv, const char *executable_path) {
     if (pid == 0) {
         reset_child_signals();
 
-        if (execv(executable_path, argv) == -1) {
+        if (apply_redirections(cmd->redirs, cmd->redir_count) < 0) {
+            exit(1);
+        }
+
+        if (execv(executable_path, cmd->args) == -1) {
             perror("launch_process:pid==0");
             exit(EXIT_FAILURE);
         }
@@ -134,21 +117,30 @@ int main(int argc, const char *argv[]) {
     setup_signal_handlers();
 
     while (1) {
-        char *command_argv[MAX_ARGS];
+        command_t cmd;
         char executable_path[MAX_PATH_LEN];
 
         char *command_line = read_user_command();
         if (command_line == NULL) continue;
 
-        if(parse_command(command_line, command_argv) != 0) continue;
-        if (command_argv[0] == NULL) continue;
+        if (parse_command(command_line, &cmd) != 0) {
+            cleanup_command(&cmd);
+            continue;
+        }
 
-        bool is_builtin = check_builtins(command_argv);
+        if (cmd.args[0] == NULL) {
+            cleanup_command(&cmd);
+            continue;
+        }
+
+        bool is_builtin = check_builtins(cmd.args);
 
         if (!is_builtin) {
-            find_command_path(command_argv[0], executable_path);
-            launch_process(command_argv, executable_path);
+            find_command_path(cmd.args[0], executable_path);
+            launch_process(&cmd, executable_path);
         }
+
+        cleanup_command(&cmd);
     }
 
     return 0;
