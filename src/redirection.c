@@ -14,6 +14,7 @@ int apply_redirections(const redirection *redirs, int count) {
         int fd;
         
         switch (r->type) {
+            case REDIR_INPUT:
                 fd = open(r->filename, O_RDONLY);
                 if (fd < 0) {
                     fprintf(stderr, "%s: %s\n", r->filename, strerror(errno));

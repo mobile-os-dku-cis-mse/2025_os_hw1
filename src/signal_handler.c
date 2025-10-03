@@ -8,6 +8,7 @@
 #include <sys/wait.h>
 
 static void sigint_handler(int sig) {
+    (void)sig;
     int saved_errno = errno;
 
     const char newline[] = "\n";
@@ -18,6 +19,7 @@ static void sigint_handler(int sig) {
 
 // Note : 나중에 잡 컨트롤 작업을 넣게 된다면 본격적으로 사용될 것.
 static void sigchld_handler(int sig) {
+    (void)sig;
     int saved_errno = errno;
 
     while (waitpid(-1, NULL, WNOHANG) > 0) {
