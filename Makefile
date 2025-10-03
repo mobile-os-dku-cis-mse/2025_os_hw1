@@ -9,7 +9,7 @@ BIN_DIR = bin
 
 SOURCES = $(wildcard $(SRC_DIR)/*.c)
 OBJECTS = $(SOURCES:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
-TARGET = $(BIN_DIR)/myprogram
+TARGET = $(BIN_DIR)/sainshell
 
 all: $(TARGET)
 
